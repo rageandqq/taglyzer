@@ -25,26 +25,35 @@ var server = http.createServer(app).listen(port, function() { //create server
 });
 
 var io = socketIO.listen(server); //Set up socket on this server
+
+if (!config && !config.twitter) { //if not provided, take from Heroku environment variables
+  config = {
+    twitter : {
+      consumer_key : process.env.CONSUMER_KEY,
+      consumer_secret : process.env.CONSUMER_SECRET,
+      access_token_key : process.env.ACCESS_TOKEN_KEY,
+      access_token_secret : process.env.ACCESS_TOKEN_SECRET
+    }
+  }
+}
 var twitClient = new twitter(config.twitter);
 
 io.on('connection', function(socket) {
   var userStream = null;
-  console.log('user connected');
 
   socket.on('analyze', function(hashtag) {
-    console.log('user wants to analyze something');
 
     twitClient.stream('statuses/filter', {track: '#' + hashtag}, function(stream) {
-      userStream  = stream; //keep track of stream
+      userStream = stream; //keep track of stream
       stream.on('data', function(data) {
-        console.log(data); //send to front end
+        //console.log(data); //send to front end
+        socket.emit(data); //new tweet
       });
     });
 
   });
 
   socket.on('disconnect', function() {
-    console.log('user disconnected');
     if (userStream) { //distroy stream
       userStream.destroy();
       userStream = null; 
