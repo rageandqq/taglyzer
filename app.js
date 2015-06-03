@@ -9,6 +9,8 @@ var port = process.env.PORT || '8080'; //Port used by Heroku for hosting
 var app = express();
 
 app.use('/', express.static(__dirname + '/public/'));
+app.use('/bower_components',  express.static(__dirname + '/bower_components/'));
+
 app.set('views', __dirname + '/views/');
 app.engine('html', require('ejs').renderFile);
 
@@ -26,7 +28,8 @@ var server = http.createServer(app).listen(port, function() { //create server
 
 var io = socketIO.listen(server); //Set up socket on this server
 
-if (!config && !config.twitter) { //if not provided, take from Heroku environment variables
+/*
+if (config == null || config.twitter == null) { //if not provided, take from Heroku environment variables
   config = {
     twitter : {
       consumer_key : process.env.CONSUMER_KEY,
@@ -35,7 +38,8 @@ if (!config && !config.twitter) { //if not provided, take from Heroku environmen
       access_token_secret : process.env.ACCESS_TOKEN_SECRET
     }
   }
-}
+}*/
+
 var twitClient = new twitter(config.twitter);
 
 io.on('connection', function(socket) {
@@ -47,7 +51,7 @@ io.on('connection', function(socket) {
       userStream = stream; //keep track of stream
       stream.on('data', function(data) {
         //console.log(data); //send to front end
-        socket.emit(data); //new tweet
+        socket.emit('tweet', data); //new tweet
       });
     });
 
