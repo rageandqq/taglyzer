@@ -1,0 +1,32 @@
+{
+  "name": "wellframe-twitter-challenge",
+  "version": "1.0.0",
+  "description": "A real-time dashboard to visualize how hashtags behave",
+  "main": "app.js",
+  "scripts": {
+    "browserify": "browserify dashboard.js | uglifyjs > public/js/bundle.js",
+    "build": "npm run browserify ",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rageandqq/wellframe-twitter-challenge.git"
+  },
+  "author": "Sameer Chitley",
+  "license": "GNU GPL v3",
+  "bugs": {
+    "url": "https://github.com/rageandqq/wellframe-twitter-challenge/issues"
+  },
+  "homepage": "https://github.com/rageandqq/wellframe-twitter-challenge",
+  "devDependencies": {
+    "browserify": "^10.2.3",
+    "uglifyjs": "^2.4.10"
+  },
+  "dependencies": {
+    "ejs": "^2.3.1",
+    "express": "^4.12.4",
+    "react": "^0.13.3",
+    "socket.io": "^1.3.5",
+    "twitter": "^1.2.5"
+  }
+}
