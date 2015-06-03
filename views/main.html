@@ -8,11 +8,20 @@
   </head>
 
   <body>
+
     <div class="jumbotron">
       <div class="container">
         <h1> Tweet Dashboard </h1>
       </div>
     </div>
+
+
+    <div class="input-group" id="hash-search">
+      <span class="input-group-addon" id="basic-addon1">#</span>
+      <input id="search" type="text" class="form-control" placeholder="Enter a hashtag to search" aria-describedby="basic-addon1">
+      <button id="search-button" class="btn btn-default">Analyze</button>
+    </div>
+
     <div id="tweet-list"></div>
 
     <script src="/bower_components/jquery/dist/jquery.min.js"></script>

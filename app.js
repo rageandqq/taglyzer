@@ -42,15 +42,24 @@ if (config == null || config.twitter == null) { //if not provided, take from Her
 
 var twitClient = new twitter(config.twitter);
 
+var killStream = function(stream) {
+  stream.destroy();
+  stream = null;
+  return stream;
+}
+
 io.on('connection', function(socket) {
   var userStream = null;
 
   socket.on('analyze', function(hashtag) {
 
+    if (userStream != null) {
+      userStream = killStream(userStream);
+    }
+    
     twitClient.stream('statuses/filter', {track: '#' + hashtag}, function(stream) {
       userStream = stream; //keep track of stream
       stream.on('data', function(data) {
-        //console.log(data); //send to front end
         socket.emit('tweet', data); //new tweet
       });
     });
@@ -58,9 +67,8 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-    if (userStream) { //distroy stream
-      userStream.destroy();
-      userStream = null; 
+    if (userStream) { //destroy stream
+      userStream = killStream(userStream);
     }
   });
 
