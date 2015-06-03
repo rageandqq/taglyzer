@@ -10,22 +10,31 @@
   <body>
 
     <div class="jumbotron">
-      <div class="container">
+      <div class="container-fluid">
         <h1> Tweet Dashboard </h1>
       </div>
     </div>
 
+    <div class="container-fluid">
 
-    <div class="input-group" id="hash-search">
-      <span class="input-group-addon" id="basic-addon1">#</span>
-      <input id="search" type="text" class="form-control" placeholder="Enter a hashtag to search" aria-describedby="basic-addon1">
-      <button id="search-button" class="btn btn-default">Analyze</button>
+      <div class="col-lg-3">
+        <div id="tweet-list" style="overflow-y: scroll; height: 400px;"></div>
+      </div>
+
+      <div class="col-lg-9">
+        <div class="row">
+          <div class="input-group" id="hash-search">
+            <span class="input-group-addon" id="basic-addon1">#</span>
+            <input id="search" type="text" class="form-control" placeholder="Enter a hashtag to search" aria-describedby="basic-addon1">
+            <button id="search-button" class="btn btn-default">Analyze</button>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div id="tweet-list"></div>
 
     <script src="/bower_components/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+    <script src="js/components.js"></script>
     <script src="js/bundle.js"></script>
   </body>
 </html>

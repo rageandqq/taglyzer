@@ -1,0 +1,20 @@
+{
+  "name": "wellframe-twitter-challenge",
+  "version": "0.0.0",
+  "homepage": "https://github.com/rageandqq/wellframe-twitter-challenge",
+  "authors": [
+    "rageandqq <chitley.sameer@gmail.com>"
+  ],
+  "license": "GNU GPL v3",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "jquery": "~2.1.4"
+  }
+}

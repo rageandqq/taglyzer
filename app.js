@@ -1,9 +1,21 @@
 var express = require('express'),
     http = require('http'),
-    config = require('./config'),
     socketIO = require('socket.io'),
     twitter = require('twitter');
 
+var config;
+try {   
+  config = require('./config');
+} catch(ex) {
+  config = {
+    twitter : {
+      consumer_key : process.env.CONSUMER_KEY,
+      consumer_secret : process.env.CONSUMER_SECRET,
+      access_token_key : process.env.ACCESS_TOKEN_KEY,
+      access_token_secret : process.env.ACCESS_TOKEN_SECRET
+    }
+  }
+}
 var port = process.env.PORT || '8080'; //Port used by Heroku for hosting
 
 var app = express();
@@ -28,18 +40,6 @@ var server = http.createServer(app).listen(port, function() { //create server
 
 var io = socketIO.listen(server); //Set up socket on this server
 
-/*
-if (config == null || config.twitter == null) { //if not provided, take from Heroku environment variables
-  config = {
-    twitter : {
-      consumer_key : process.env.CONSUMER_KEY,
-      consumer_secret : process.env.CONSUMER_SECRET,
-      access_token_key : process.env.ACCESS_TOKEN_KEY,
-      access_token_secret : process.env.ACCESS_TOKEN_SECRET
-    }
-  }
-}*/
-
 var twitClient = new twitter(config.twitter);
 
 var killStream = function(stream) {
@@ -56,7 +56,7 @@ io.on('connection', function(socket) {
     if (userStream != null) {
       userStream = killStream(userStream);
     }
-    
+
     twitClient.stream('statuses/filter', {track: '#' + hashtag}, function(stream) {
       userStream = stream; //keep track of stream
       stream.on('data', function(data) {
