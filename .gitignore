@@ -32,3 +32,4 @@ config.js
 
 # swap files
 *.*.swp
+*.*.swo

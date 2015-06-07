@@ -29,7 +29,7 @@ var TweetList = React.createClass({
           <span className="input-group-addon">
             <input type="checkbox" checked={this.state.autoScrollTweets} onChange={this.handleAutoScrollChange} />
           </span>
-          <input type="text" value="Auto scroll" className="form-control" aria-label=".." readonly/>
+          <input type="text" value="Auto scroll" className="form-control" aria-label=".." readOnly/>
         </div>
       </div> 
     </div>

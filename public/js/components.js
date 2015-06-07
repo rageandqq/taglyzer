@@ -98,11 +98,11 @@ var Dashboard = React.createClass({displayName: "Dashboard",
         React.createElement("div", null, 
           React.createElement("div", {className: "jumbotron"}, 
             React.createElement("div", {className: "container-fluid"}, 
-              React.createElement("div", {className: "col-lg-3 col-sm-3"}, 
+              React.createElement("div", {className: "col-lg-2 col-sm-2"}, 
                 React.createElement("h1", null, this.props.appName)
               ), 
 
-              React.createElement("div", {className: "col-lg-9 col-sm-9"}, 
+              React.createElement("div", {className: "col-lg-10 col-sm-10"}, 
                 React.createElement("div", {className: "row"}, 
                   React.createElement("div", {className: "form-group"}, 
                     React.createElement("div", {className: "input-group"}, 
@@ -120,13 +120,34 @@ var Dashboard = React.createClass({displayName: "Dashboard",
 
           React.createElement("div", {className: "container-fluid"}, 
             React.createElement("div", {className: "col-lg-3"}, 
-              React.createElement("div", {className: "row"}, 
+              React.createElement("div", {className: "panel panel-default"}, 
                 React.createElement(TweetList, {tweetList: this.state.tweetList})
               )
             ), 
             React.createElement("div", {className: "col-lg-9"}, 
-                React.createElement("p", null, "Velocity ", this.state.tweetVelocity, " "), 
-                React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration, " ")
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-lg-6"}, 
+                  React.createElement("div", {className: "panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Velocity (tweets/second)")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement("p", null, "Velocity ", this.state.tweetVelocity), 
+                      React.createElement(VelocityChart, {velocity: this.state.tweetVelocity})
+                    )
+                  )
+                ), 
+                React.createElement("div", {className: "col-lg-6"}, 
+                  React.createElement("div", {className: "panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Acceleration (tweets/second", React.createElement("sup", null, "2"), ")")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration)
+                    )
+                  )
+                )
+              )
             )
           )
 
@@ -166,7 +187,7 @@ var TweetList = React.createClass({displayName: "TweetList",
           React.createElement("span", {className: "input-group-addon"}, 
             React.createElement("input", {type: "checkbox", checked: this.state.autoScrollTweets, onChange: this.handleAutoScrollChange})
           ), 
-          React.createElement("input", {type: "text", value: "Auto scroll", className: "form-control", "aria-label": "..", readonly: true})
+          React.createElement("input", {type: "text", value: "Auto scroll", className: "form-control", "aria-label": "..", readOnly: true})
         )
       )
     )
@@ -181,3 +202,37 @@ var Tweet = React.createClass({displayName: "Tweet",
 });
 
 
+
+var VelocityChart = React.createClass({displayName: "VelocityChart",
+  getInitialState : function() {
+    return {
+      epoch : null,
+      velocity : 0
+    }
+  },
+  componentWillReceiveProps : function(props) {
+    var chart = this.state.epoch;
+    if (chart != null && this.state.velocity != props.velocity) {
+      var now = new Date();
+      chart.push([{time:now.getTime(), y:props.velocity}]);
+      this.setState({velocity : props.velocity});
+    }
+  },
+  componentDidMount : function() {
+    var now = new Date();
+    var chart = $('#velocityChart').epoch({
+      type : 'time.area',
+      data : [{
+        label : "Velocity",
+        values : [ { time: now.getTime(), y: 0 }]
+      }],
+      axes : ['bottom', 'left']
+    });
+    this.setState({epoch : chart});
+  },
+  render : function() {
+    return (
+      React.createElement("div", {id: "velocityChart"})
+    );
+  }
+});

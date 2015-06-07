@@ -2,3 +2,7 @@
   overflow-y: scroll;
   height: 400px; //fallback
 }
+
+#velocityChart { 
+  height: 400px;
+}

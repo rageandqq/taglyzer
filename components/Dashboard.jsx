@@ -98,11 +98,11 @@ var Dashboard = React.createClass({
         <div>
           <div className="jumbotron">
             <div className="container-fluid">
-              <div className="col-lg-3 col-sm-3">
+              <div className="col-lg-2 col-sm-2">
                 <h1>{this.props.appName}</h1>
               </div>
 
-              <div className="col-lg-9 col-sm-9">
+              <div className="col-lg-10 col-sm-10">
                 <div className="row">
                   <div className="form-group">
                     <div className="input-group">
@@ -120,13 +120,34 @@ var Dashboard = React.createClass({
 
           <div className="container-fluid">
             <div className="col-lg-3">
-              <div className="row">
+              <div className="panel panel-default">
                 <TweetList tweetList={this.state.tweetList} />
               </div>
             </div>
             <div className="col-lg-9">
-                <p>Velocity {this.state.tweetVelocity} </p>
-                <p>Acceleration {this.state.tweetAcceleration} </p>
+              <div className="row">
+                <div className="col-lg-6">
+                  <div className="panel-default">
+                    <div className="panel-heading">
+                      <h3 className="panel-title">Velocity (tweets/second)</h3>
+                    </div>
+                    <div className="panel-body">
+                      <p>Velocity {this.state.tweetVelocity}</p>
+                      <VelocityChart velocity={this.state.tweetVelocity}/>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <div className="panel-default">
+                    <div className="panel-heading">
+                      <h3 className="panel-title">Acceleration (tweets/second<sup>2</sup>)</h3>
+                    </div>
+                    <div className="panel-body">
+                      <p>Acceleration {this.state.tweetAcceleration}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
