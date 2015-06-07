@@ -4,7 +4,7 @@ var TweetList = React.createClass({
   },
   getInitialState : function() {
     return {
-      autoScrollTweets : true
+      autoScrollTweets : false,
     }   
   },
   handleAutoScrollChange : function(event) {
@@ -15,12 +15,14 @@ var TweetList = React.createClass({
     if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
+    var count = 0;
     return (
     <div className="panel-body">
       <div className="list-group" id="tweetList">
       {
         this.props.tweetList.map(function(tweet) {
-          return <Tweet key={tweet.id} val={tweet.text} />;
+          count++;
+          return <Tweet key={count + '' + tweet.id} val={tweet.text} />;
         })
       }
       </div>

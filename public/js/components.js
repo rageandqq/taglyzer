@@ -76,7 +76,9 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       lastUpdateCount : 0,
       tweetCount : 0,
       retweetCount : 0,
-      retweetPerce : 0
+      retweetPerce : 0,
+      characterUsePercentage : 0,
+      characterCount : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
@@ -300,7 +302,7 @@ var TweetList = React.createClass({displayName: "TweetList",
   },
   getInitialState : function() {
     return {
-      autoScrollTweets : true
+      autoScrollTweets : false,
     }   
   },
   handleAutoScrollChange : function(event) {
@@ -311,12 +313,14 @@ var TweetList = React.createClass({displayName: "TweetList",
     if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
+    var count = 0;
     return (
     React.createElement("div", {className: "panel-body"}, 
       React.createElement("div", {className: "list-group", id: "tweetList"}, 
       
         this.props.tweetList.map(function(tweet) {
-          return React.createElement(Tweet, {key: tweet.id, val: tweet.text});
+          count++;
+          return React.createElement(Tweet, {key: count + '' + tweet.id, val: tweet.text});
         })
       
       ), 

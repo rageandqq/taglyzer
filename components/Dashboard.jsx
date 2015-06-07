@@ -76,7 +76,9 @@ var Dashboard = React.createClass({
       lastUpdateCount : 0,
       tweetCount : 0,
       retweetCount : 0,
-      retweetPerce : 0
+      retweetPerce : 0,
+      characterUsePercentage : 0,
+      characterCount : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
