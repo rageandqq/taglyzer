@@ -7,7 +7,10 @@ var Dashboard = React.createClass({
               tweetList : [],
               autoScrollTweets : true,
               lastSearchedTerm : "",
-              lastVelUpdateTime : new Date()
+              lastUpdateTime : new Date(),
+              lastUpdateCount : 0,
+              tweetVelocity : 0,
+              tweetAcceleration : 0
            };
   },
   componentDidMount : function() {
@@ -29,7 +32,19 @@ var Dashboard = React.createClass({
     if (this.state.loading) {
       this.resetTweets(false);
     }
+
     this.addTweet(data);
+
+    var now = new Date();
+    var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
+    if (delta >= 1000) {
+      this.updateAcceleration(delta); //update acceleration before velocity is updated
+      this.updateVelocity(delta);
+      this.setState({
+        lastUpdateTime : now,
+        lastUpdateCount : this.state.tweetList.length
+      });
+    }
   },
   addTweet : function(data) {
     var list = this.state.tweetList;
@@ -39,7 +54,11 @@ var Dashboard = React.createClass({
   resetTweets : function(isLoading) {
     var localState = {
       tweetList : [],
-      loading : false
+      loading : false,
+      tweetVelocity : 0,
+      tweetAcceleration : 0,
+      lastUpdateTime : new Date(),
+      lastUpdateCount : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
@@ -57,6 +76,21 @@ var Dashboard = React.createClass({
   },
   handleSearchTermChange : function(event) {
     this.setState({searchTerm : event.target.value});
+  },
+  updateVelocity : function(delta) {
+    var tweetCount = this.state.tweetList.length;
+    var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
+    this.setState({
+      tweetVelocity : vel
+    });
+  },
+  updateAcceleration : function(delta) {
+    var tweetCount = this.state.tweetList.length;
+    var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
+    var accel = (vel - this.state.tweetVelocity)/(delta/1000);
+    this.setState({
+      tweetAcceleration : accel
+    });
   },
   render : function() {
     return (
@@ -91,7 +125,8 @@ var Dashboard = React.createClass({
               </div>
             </div>
             <div className="col-lg-9">
-
+                <p>Velocity {this.state.tweetVelocity} </p>
+                <p>Acceleration {this.state.tweetAcceleration} </p>
             </div>
           </div>
 
