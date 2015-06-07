@@ -6,6 +6,7 @@ var Dashboard = React.createClass({
               searchTerm : "",
               tweetList : [],
               autoScrollTweets : true,
+              lastSearchedTerm : "",
               lastVelUpdateTime : new Date()
            };
   },
@@ -20,9 +21,13 @@ var Dashboard = React.createClass({
     });
 
   },
-  handleIncomingTweet : function(data) {
+  handleIncomingTweet : function(message) {
+    if (this.state.lastSearchedTerm == message.hashtag) {
+      return;
+    }
+    var data = message.data;
     if (this.state.loading) {
-      this.reset();
+      this.resetTweets(false);
     }
     this.addTweet(data);
   },
@@ -31,13 +36,22 @@ var Dashboard = React.createClass({
     list.push(data);
     this.setState({tweetList : list});
   },
-  reset : function() {
-    this.setState(this.getInitialState());
+  resetTweets : function(isLoading) {
+    var localState = {
+      tweetList : [],
+      loading : false
+    }
+    if (isLoading) {
+      localState.tweetList.push({text:"LOADING"});
+      localState.loading = true;
+    }
+    this.setState(localState);
   },
   search : function() {
-    this.reset();
     var socket = this.state.socket;
-    if (socket != null) {
+    if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
+      this.setState({lastSearchedTerm : this.state.searchTerm});
+      this.resetTweets(true);
       socket.emit('analyze', this.state.searchTerm);
     }
   },

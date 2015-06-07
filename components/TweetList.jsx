@@ -16,7 +16,7 @@ var TweetList = React.createClass({
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
     return (
-    <div>
+    <div className="panel-body">
       <div className="list-group" id="tweetList">
       {
         this.props.tweetList.map(function(tweet) {
@@ -24,7 +24,7 @@ var TweetList = React.createClass({
         })
       }
       </div>
-      <div className="row">
+      <div className="panel-footer">
         <div className="input-group">
           <span className="input-group-addon">
             <input type="checkbox" checked={this.state.autoScrollTweets} onChange={this.handleAutoScrollChange} />

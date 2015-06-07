@@ -5,7 +5,9 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               socket : null,
               searchTerm : "",
               tweetList : [],
-              autoScrollTweets : true
+              autoScrollTweets : true,
+              lastSearchedTerm : "",
+              lastVelUpdateTime : new Date()
            };
   },
   componentDidMount : function() {
@@ -19,9 +21,13 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     });
 
   },
-  handleIncomingTweet : function(data) {
+  handleIncomingTweet : function(message) {
+    if (this.state.lastSearchedTerm == message.hashtag) {
+      return;
+    }
+    var data = message.data;
     if (this.state.loading) {
-      this.reset();
+      this.resetTweets(false);
     }
     this.addTweet(data);
   },
@@ -30,12 +36,22 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     list.push(data);
     this.setState({tweetList : list});
   },
-  reset : function() {
-    this.setState(this.getInitialState());
+  resetTweets : function(isLoading) {
+    var localState = {
+      tweetList : [],
+      loading : false
+    }
+    if (isLoading) {
+      localState.tweetList.push({text:"LOADING"});
+      localState.loading = true;
+    }
+    this.setState(localState);
   },
   search : function() {
     var socket = this.state.socket;
-    if (socket != null) {
+    if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
+      this.setState({lastSearchedTerm : this.state.searchTerm});
+      this.resetTweets(true);
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -102,7 +118,7 @@ var TweetList = React.createClass({displayName: "TweetList",
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
     return (
-    React.createElement("div", null, 
+    React.createElement("div", {className: "panel-body"}, 
       React.createElement("div", {className: "list-group", id: "tweetList"}, 
       
         this.props.tweetList.map(function(tweet) {
@@ -110,7 +126,7 @@ var TweetList = React.createClass({displayName: "TweetList",
         })
       
       ), 
-      React.createElement("div", {className: "row"}, 
+      React.createElement("div", {className: "panel-footer"}, 
         React.createElement("div", {className: "input-group"}, 
           React.createElement("span", {className: "input-group-addon"}, 
             React.createElement("input", {type: "checkbox", checked: this.state.autoScrollTweets, onChange: this.handleAutoScrollChange})

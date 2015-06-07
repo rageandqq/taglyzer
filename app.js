@@ -54,16 +54,16 @@ io.on('connection', function(socket) {
   socket.on('analyze', function(hashtag) {
     
     //remove non-alphanumeric and trailing space
-    hashtag = hashtag.replace(/\W/g, '').trim();
+    var cleanedHashtag = hashtag.replace(/\W/g, '').trim();
 
     if (userStream != null) {
       userStream = killStream(userStream);
     }
 
-    twitClient.stream('statuses/filter', {track: '#' + hashtag}, function(stream) {
+    twitClient.stream('statuses/filter', {track: '#' + cleanedHashtag}, function(stream) {
       userStream = stream; //keep track of stream
       stream.on('data', function(data) {
-        socket.emit('tweet', data); //new tweet
+        socket.emit('tweet', {message : cleanedHashtag, data: data}); //new tweet
       });
     });
 
