@@ -16,7 +16,9 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               retweetCount : 0,
               retweetPercentage : 0,
               characterUsePercentage : 0,
-              characterCount : 0
+              characterCount : 0,
+              hashtagCount : 0,
+              hashtagAverage: 0
            };
   },
   componentDidMount : function() {
@@ -42,7 +44,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     this.addTweet(data);
     this.updateRetweetCount(data);
     this.updateCharacterCount(data);
-
+    this.updateHashtagCount(data);
 
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
@@ -62,7 +64,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     list.push(data);
     count++;
     if (list.length > this.state.tweetHistory) {
-      list.unshift();
+      list.shift();
     }
     this.setState({tweetList : list, tweetCount: count});
   },
@@ -100,6 +102,14 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     this.setState({
       characterCount : updatedCCount,
       characterUsePercentage : updatedCCount/(144 * this.state.tweetCount) //max # characters
+    });
+  },
+  updateHashtagCount : function(data) {
+    var hCount = this.state.hashtagCount;
+    var updatedHCount = hCount + data.entities.hashtags.length;
+    this.setState({
+      hashtagCount : updatedHCount,
+      hashtagAverage : updatedHCount/this.state.tweetCount
     });
   },
   search : function() {
@@ -204,15 +214,22 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                 React.createElement("div", {className: "col-lg-4"}, 
                   React.createElement("div", {className: "panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
+                    )
+                  )
+                ), 
+                React.createElement("div", {className: "col-lg-4"}, 
+                  React.createElement("div", {className: "panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Average Character Use (out of 144)")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement(RealTimeGauge, {ref: "characterGauge", data: this.state.characterUsePercentage, dataType: "character"})
                     )
                   )
-                ), 
-                React.createElement("div", {className: "col-lg-4"}
-
                 )
               ), 
               React.createElement("div", {className: "row"}
@@ -258,7 +275,7 @@ var RealTimeChart = React.createClass({displayName: "RealTimeChart",
   },
   render : function() {
     return (
-      React.createElement("div", {id: this.props.dataType+'Chart', className: "real-time-chart"})
+      React.createElement("div", {id: this.props.dataType+'Chart', className: "real-time-chart epoch category10"})
     );
   }
 });

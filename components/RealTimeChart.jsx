@@ -31,7 +31,7 @@ var RealTimeChart = React.createClass({
   },
   render : function() {
     return (
-      <div id={this.props.dataType+'Chart'} className="real-time-chart"></div>
+      <div id={this.props.dataType+'Chart'} className="real-time-chart epoch category10"></div>
     );
   }
 });

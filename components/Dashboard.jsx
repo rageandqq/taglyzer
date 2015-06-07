@@ -16,7 +16,9 @@ var Dashboard = React.createClass({
               retweetCount : 0,
               retweetPercentage : 0,
               characterUsePercentage : 0,
-              characterCount : 0
+              characterCount : 0,
+              hashtagCount : 0,
+              hashtagAverage: 0
            };
   },
   componentDidMount : function() {
@@ -42,7 +44,7 @@ var Dashboard = React.createClass({
     this.addTweet(data);
     this.updateRetweetCount(data);
     this.updateCharacterCount(data);
-
+    this.updateHashtagCount(data);
 
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
@@ -62,7 +64,7 @@ var Dashboard = React.createClass({
     list.push(data);
     count++;
     if (list.length > this.state.tweetHistory) {
-      list.unshift();
+      list.shift();
     }
     this.setState({tweetList : list, tweetCount: count});
   },
@@ -100,6 +102,14 @@ var Dashboard = React.createClass({
     this.setState({
       characterCount : updatedCCount,
       characterUsePercentage : updatedCCount/(144 * this.state.tweetCount) //max # characters
+    });
+  },
+  updateHashtagCount : function(data) {
+    var hCount = this.state.hashtagCount;
+    var updatedHCount = hCount + data.entities.hashtags.length;
+    this.setState({
+      hashtagCount : updatedHCount,
+      hashtagAverage : updatedHCount/this.state.tweetCount
     });
   },
   search : function() {
@@ -204,15 +214,22 @@ var Dashboard = React.createClass({
                 <div className="col-lg-4">
                   <div className="panel-default">
                     <div className="panel-heading">
+                      <h3 className="panel-title">Hashtags per Tweet</h3>
+                    </div>
+                    <div className="panel-body">
+                      <RealTimeChart ref="hashtagChart" data={this.state.hashtagAverage} dataType="hashtag" chartType="bar"/>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4">
+                  <div className="panel-default">
+                    <div className="panel-heading">
                       <h3 className="panel-title">Average Character Use (out of 144)</h3>
                     </div>
                     <div className="panel-body">
                       <RealTimeGauge ref="characterGauge" data={this.state.characterUsePercentage} dataType="character"/>
                     </div>
                   </div>
-                </div>
-                <div className="col-lg-4">
-
                 </div>
               </div>
               <div className="row">
