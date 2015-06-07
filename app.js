@@ -52,6 +52,9 @@ io.on('connection', function(socket) {
   var userStream = null;
 
   socket.on('analyze', function(hashtag) {
+    
+    //remove non-alphanumeric and trailing space
+    hashtag = hashtag.replace(/\W/g, '').trim();
 
     if (userStream != null) {
       userStream = killStream(userStream);
