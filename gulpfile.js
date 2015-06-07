@@ -10,6 +10,11 @@ gulp.task('react', function () {
     .pipe(gulp.dest('public/js/'));
 });
 
+gulp.task('react-debug', function() {
+  gulp.src('components/**')
+    .pipe(react())
+});
+
 gulp.task('default', ['react', 'wiredep']);
 
 gulp.task('wiredep', function () {

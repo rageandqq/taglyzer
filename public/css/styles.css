@@ -1,6 +1,6 @@
 #tweetList {
   overflow-y: scroll;
-  height: 400px; //fallback
+  height: 400px; 
 }
 
 .real-time-chart {

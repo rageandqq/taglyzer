@@ -5,7 +5,6 @@ var Dashboard = React.createClass({
               socket : null,
               searchTerm : "",
               tweetList : [],
-              autoScrollTweets : true,
               lastSearchedTerm : "",
               lastUpdateTime : new Date(),
               lastUpdateCount : 0,
@@ -58,7 +57,6 @@ var Dashboard = React.createClass({
     }
   },
   addTweet : function(data) {
-    console.log(data);
     var list = this.state.tweetList;
     var count = this.state.tweetCount;
     list.push(data);
@@ -143,6 +141,17 @@ var Dashboard = React.createClass({
       tweetAcceleration : accel
     });
   },
+  parseTweetCoordinates : function(f) {
+    if (f.coordinates == null) {
+      f.coordinates = f.retweeted_status.coordinates
+    }
+    return {
+      lng : parseFloat(f.coordinates.coordinates[0]),
+      lat : parseFloat(f.coordinates.coordinates[1]),
+      value: 1,
+      key : parseFloat(f.coordinates.coordinates[0]) + ';' + parseFloat(f.coordinates.coordinates[1]) ,
+    }
+  },
   render : function() {
     return (
 
@@ -181,6 +190,29 @@ var Dashboard = React.createClass({
               <TweetList tweetList={this.state.tweetList} tweetCount={this.state.tweetCount} />
             </div>
             <div className="col-md-10">
+              <div className="row">
+                <div className="col-md-12">
+                  <TweetMap coordinates={this.state.tweetList.filter(function(f) {
+                    return f.coordinates != null || 
+                      (f.retweeted_status != null && f.retweeted_status.coordinates != null);
+                  }).map(this.parseTweetCoordinates)
+                    .reduce(function(tweet1, tweet2) {
+                      var index = -1;
+                      for (var i = 0; i < tweet1.length; i++) {
+                        if (tweet1[i].key == tweet2.key) {
+                          index = i;
+                          break;
+                        }
+                      }
+                      if (index != -1) {
+                        tweet1[index].value++;
+                      }
+                      else
+                        tweet1.push(tweet2);
+                      return tweet1;
+                    }, [])} />
+                </div>
+              </div>
               <div className="row">
                 <div className="col-md-6">
                   <div className="panel panel-default">
