@@ -6,7 +6,14 @@ html, body {
 
 #tweetList {
   overflow-y: scroll;
-  height: 75vh; 
+  height: 400px;
+}
+
+@media(max-height:599px) {
+  #tweetList {
+    overflow-y: scroll;
+    height: 300px;
+  }
 }
 
 .real-time-chart {
