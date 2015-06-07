@@ -116,7 +116,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
       this.setState({lastSearchedTerm : this.state.searchTerm});
       this.resetTweets(true);
-      ['accelChart', 'velChart', 'characterGauge', 'retweetGauge']
+      ['accelChart', 'velChart', 'characterGauge', 'retweetGauge', 'hashtagChart']
         .forEach(function(chart) {
           self.refs[chart].resetChart();
         });
@@ -164,10 +164,10 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               ), 
 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-4"}
+                React.createElement("div", {className: "col-sm-2 col-md-4"}
 
                 ), 
-                React.createElement("div", {className: "col-md-4"}, 
+                React.createElement("div", {className: "col-sm-10 col-md-4"}, 
                   React.createElement("div", {className: "form-group"}, 
                     React.createElement("div", {className: "input-group"}, 
                       React.createElement("span", {className: "input-group-addon"}, "#"), 
@@ -178,7 +178,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-md-4"}
+                React.createElement("div", {className: "col-sm-2 col-md-4"}
 
                 )
               )
@@ -186,12 +186,12 @@ var Dashboard = React.createClass({displayName: "Dashboard",
           ), 
 
           React.createElement("div", {className: "container-fluid"}, 
-            React.createElement("div", {className: "col-md-2"}, 
+            React.createElement("div", {className: "col-sm-12 col-md-2"}, 
               React.createElement(TweetList, {tweetList: this.state.tweetList, tweetCount: this.state.tweetCount})
             ), 
-            React.createElement("div", {className: "col-md-10"}, 
+            React.createElement("div", {className: "cols-sm-12 col-md-10"}, 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-12"}, 
+                React.createElement("div", {className: "col-sm-12 col-md-6"}, 
                   React.createElement(TweetMap, {coordinates: this.state.tweetList.filter(function(f) {
                     return f.coordinates != null || 
                       (f.retweeted_status != null && f.retweeted_status.coordinates != null);
@@ -211,10 +211,20 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                         tweet1.push(tweet2);
                       return tweet1;
                     }, [])})
+                ), 
+                React.createElement("div", {className: "col-sm-12 col-md-6"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
+                    )
+                  )
                 )
               ), 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-6"}, 
+                React.createElement("div", {className: "col-sm-12 col-md-6"}, 
                   React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Velocity (tweets/second)")
@@ -225,7 +235,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-md-6"}, 
+                React.createElement("div", {className: "col-sm-12 col-md-6"}, 
                   React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Acceleration (tweets/second", React.createElement("sup", null, "2"), ")")
@@ -238,7 +248,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                 )
               ), 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
+                React.createElement("div", {className: "col-md-6"}, 
                   React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Retweet Percentage")
@@ -248,17 +258,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
-                  React.createElement("div", {className: "panel panel-default"}, 
-                    React.createElement("div", {className: "panel-heading"}, 
-                      React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
-                    ), 
-                    React.createElement("div", {className: "panel-body"}, 
-                      React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
-                    )
-                  )
-                ), 
-                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
+                React.createElement("div", {className: "col-sm-12 col-md-6"}, 
                   React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Average Character Use (out of 144)")
@@ -273,7 +273,6 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               )
             )
           )
-
         )
     );
   }
@@ -302,8 +301,7 @@ var RealTimeChart = React.createClass({displayName: "RealTimeChart",
         label : this.props.dataType,
         values : [ { time: now.getTime()/1000, y: 0 }]
       }],
-      axes : ['bottom', 'left'],
-      height: 300
+      axes : ['bottom', 'left']
     });
     this.setState({epoch : chart});
   },
@@ -335,8 +333,7 @@ var RealTimeGauge = React.createClass({displayName: "RealTimeGauge",
     var now = new Date();
     var chart = $('#' + this.props.dataType + 'Gauge').epoch({
       type : 'time.gauge',
-      data : 0,
-      height : 300
+      data : 0
     });
     this.setState({epoch : chart, data : 0});
   },
@@ -451,7 +448,7 @@ var TweetMap = React.createClass({displayName: "TweetMap",
 
     var map = L.map('tweetMap', {
       center : new L.LatLng(25.6856, -80.3568),
-      zoom : 4,
+      zoom : 1,
       layers: [baseLayer, heatmapLayer]
     });
 
@@ -464,7 +461,7 @@ var TweetMap = React.createClass({displayName: "TweetMap",
             React.createElement("h3", {className: "panel-title"}, " Tweet Distribution")
           ), 
           React.createElement("div", {className: "panel-body"}, 
-            React.createElement("div", {id: "tweetMap", className: "center-block", style: {width: '50%', height : '400px'}})
+            React.createElement("div", {id: "tweetMap", className: "center-block"})
           )
         )
       );

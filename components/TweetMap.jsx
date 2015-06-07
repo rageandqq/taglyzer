@@ -39,7 +39,7 @@ var TweetMap = React.createClass({
 
     var map = L.map('tweetMap', {
       center : new L.LatLng(25.6856, -80.3568),
-      zoom : 4,
+      zoom : 1,
       layers: [baseLayer, heatmapLayer]
     });
 
@@ -52,7 +52,7 @@ var TweetMap = React.createClass({
             <h3 className="panel-title"> Tweet Distribution</h3>
           </div>
           <div className="panel-body">
-            <div id="tweetMap" className="center-block" style={{width: '50%', height : '400px'}} ></div>
+            <div id="tweetMap" className="center-block" ></div>
           </div>
         </div>
       );

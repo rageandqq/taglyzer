@@ -16,8 +16,7 @@ var RealTimeGauge = React.createClass({
     var now = new Date();
     var chart = $('#' + this.props.dataType + 'Gauge').epoch({
       type : 'time.gauge',
-      data : 0,
-      height : 300
+      data : 0
     });
     this.setState({epoch : chart, data : 0});
   },

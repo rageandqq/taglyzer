@@ -1,8 +1,26 @@
+html, body {
+  width: 100%;
+  height: 100;
+  margin: 0;
+}
+
 #tweetList {
   overflow-y: scroll;
-  height: 400px; 
+  height: 75vh; 
 }
 
 .real-time-chart {
   border : 1px solid #C0C0C0;
+  height: 300px;
+  padding: 5px 5px 5px 5px;
+  margin : 0 auto;
+}
+
+.real-time-chart > * {
+  width: 90%;
+}
+
+#tweetMap {
+  height: 300px;  
+  width: 100%;
 }
