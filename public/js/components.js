@@ -11,7 +11,6 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               tweetVelocity : 0,
               tweetAcceleration : 0,
               tweetCount : 0,
-              tweetHistory : 50, //show no more than 100 tweets
               retweetCount : 0,
               retweetPercentage : 0,
               characterUsePercentage : 0,
@@ -65,9 +64,6 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     var count = this.state.tweetCount;
     list.push(data);
     count++;
-    if (list.length > this.state.tweetHistory) {
-      list.shift();
-    }
     this.setState({tweetList : list, tweetCount: count});
   },
   resetTweets : function(isLoading) {
@@ -99,14 +95,20 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     });
   },
   updateCharacterCount : function(data) {
+    if (data.text == null) {
+      return;
+    }
     var cCount = this.state.characterCount;
-    var updatedCCount = cCount = cCount + data.text.length;
+    var updatedCCount = cCount + data.text.length;
     this.setState({
       characterCount : updatedCCount,
       characterUsePercentage : updatedCCount/(144 * this.state.tweetCount) //max # characters
     });
   },
   updateHashtagCount : function(data) {
+    if (data.entities == null || data.entities.hashtags == null) {
+      return;
+    }
     var hCount = this.state.hashtagCount;
     var updatedHCount = hCount + data.entities.hashtags.length;
     this.setState({
@@ -125,6 +127,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
         .forEach(function(chart) {
           self.refs[chart].resetChart();
         });
+      this.refs['tweetMap'].resetMap();
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -152,7 +155,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
         f.coordinates = f.retweeted_status.coordinates
       }
       else {
-        f.coordinates = {
+        f.coordinates = { //parse to same format as from coordinates/retweeted_status
           coordinates : [
               f.place.bounding_box.coordinates[0][0],
               f.place.bounding_box.coordinates[0][1]
@@ -169,7 +172,6 @@ var Dashboard = React.createClass({displayName: "Dashboard",
   },
   addToTweetMap : function(data) {
     var coordinates = this.parseTweetCoordinates(data);
-    console.log(coordinates);
     this.refs['tweetMap'].addPoint(coordinates);
   },
   hasCoordinates : function(tweet) {
@@ -368,7 +370,7 @@ var TweetList = React.createClass({displayName: "TweetList",
   },
   render : function() {
     var domElem = $('#tweetList');
-    if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
+    if (this.state.autoScrollTweets && domElem != null && domElem[0] != null && this.props.tweetCount < 200) { //don't scroll if there are too many
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
     var salt = 0;
@@ -382,7 +384,8 @@ var TweetList = React.createClass({displayName: "TweetList",
         
           this.props.tweetList.map(function(tweet) {
             salt++;
-            return React.createElement(Tweet, {key: salt + '' + tweet.id, val: tweet.text});
+            if (salt < 200) 
+              return React.createElement(Tweet, {key: salt + '' + tweet.id, val: tweet.text});
           })
         
         ), 
@@ -452,6 +455,17 @@ var TweetMap = React.createClass({displayName: "TweetMap",
     });
 
     self.setState({heatmapLayer : heatmapLayer});
+  },
+  resetMap : function() {
+    var mapLayer = this.state.heatmapLayer;
+    if (mapLayer != null) {
+      var tweetData = this.getInitialState().tweetData;
+      mapLayer.setData(tweetData);
+      this.setState({
+        heatmapLayer : mapLayer,
+        tweetData : tweetData
+      });
+    }
   },
   addPoint : function(coords) {
     var data = this.state.tweetData.data;

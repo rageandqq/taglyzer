@@ -12,7 +12,7 @@ var TweetList = React.createClass({
   },
   render : function() {
     var domElem = $('#tweetList');
-    if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
+    if (this.state.autoScrollTweets && domElem != null && domElem[0] != null && this.props.tweetCount < 200) { //don't scroll if there are too many
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
     var salt = 0;
@@ -26,7 +26,8 @@ var TweetList = React.createClass({
         {
           this.props.tweetList.map(function(tweet) {
             salt++;
-            return <Tweet key={salt + '' + tweet.id} val={tweet.text} />;
+            if (salt < 200) 
+              return <Tweet key={salt + '' + tweet.id} val={tweet.text} />;
           })
         }
         </div>

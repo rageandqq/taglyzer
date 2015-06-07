@@ -11,7 +11,6 @@ var Dashboard = React.createClass({
               tweetVelocity : 0,
               tweetAcceleration : 0,
               tweetCount : 0,
-              tweetHistory : 50, //show no more than 100 tweets
               retweetCount : 0,
               retweetPercentage : 0,
               characterUsePercentage : 0,
@@ -65,9 +64,6 @@ var Dashboard = React.createClass({
     var count = this.state.tweetCount;
     list.push(data);
     count++;
-    if (list.length > this.state.tweetHistory) {
-      list.shift();
-    }
     this.setState({tweetList : list, tweetCount: count});
   },
   resetTweets : function(isLoading) {
@@ -99,14 +95,20 @@ var Dashboard = React.createClass({
     });
   },
   updateCharacterCount : function(data) {
+    if (data.text == null) {
+      return;
+    }
     var cCount = this.state.characterCount;
-    var updatedCCount = cCount = cCount + data.text.length;
+    var updatedCCount = cCount + data.text.length;
     this.setState({
       characterCount : updatedCCount,
       characterUsePercentage : updatedCCount/(144 * this.state.tweetCount) //max # characters
     });
   },
   updateHashtagCount : function(data) {
+    if (data.entities == null || data.entities.hashtags == null) {
+      return;
+    }
     var hCount = this.state.hashtagCount;
     var updatedHCount = hCount + data.entities.hashtags.length;
     this.setState({
@@ -125,6 +127,7 @@ var Dashboard = React.createClass({
         .forEach(function(chart) {
           self.refs[chart].resetChart();
         });
+      this.refs['tweetMap'].resetMap();
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -152,7 +155,7 @@ var Dashboard = React.createClass({
         f.coordinates = f.retweeted_status.coordinates
       }
       else {
-        f.coordinates = {
+        f.coordinates = { //parse to same format as from coordinates/retweeted_status
           coordinates : [
               f.place.bounding_box.coordinates[0][0],
               f.place.bounding_box.coordinates[0][1]
@@ -169,7 +172,6 @@ var Dashboard = React.createClass({
   },
   addToTweetMap : function(data) {
     var coordinates = this.parseTweetCoordinates(data);
-    console.log(coordinates);
     this.refs['tweetMap'].addPoint(coordinates);
   },
   hasCoordinates : function(tweet) {

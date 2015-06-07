@@ -37,6 +37,17 @@ var TweetMap = React.createClass({
 
     self.setState({heatmapLayer : heatmapLayer});
   },
+  resetMap : function() {
+    var mapLayer = this.state.heatmapLayer;
+    if (mapLayer != null) {
+      var tweetData = this.getInitialState().tweetData;
+      mapLayer.setData(tweetData);
+      this.setState({
+        heatmapLayer : mapLayer,
+        tweetData : tweetData
+      });
+    }
+  },
   addPoint : function(coords) {
     var data = this.state.tweetData.data;
     var index = -1;
