@@ -183,23 +183,23 @@ var Dashboard = React.createClass({
             <div className="col-md-10">
               <div className="row">
                 <div className="col-md-6">
-                  <div className="panel-default">
+                  <div className="panel panel-default">
                     <div className="panel-heading">
                       <h3 className="panel-title">Velocity (tweets/second)</h3>
                     </div>
                     <div className="panel-body">
-                      <p>Velocity {this.state.tweetVelocity}</p>
+                      <h4 className="text-center">Current Velocity: {this.state.tweetVelocity}</h4>
                       <RealTimeChart ref="velChart" data={this.state.tweetVelocity} dataType="velocity" chartType="area"/>
                     </div>
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <div className="panel-default">
+                  <div className="panel panel-default">
                     <div className="panel-heading">
                       <h3 className="panel-title">Acceleration (tweets/second<sup>2</sup>)</h3>
                     </div>
                     <div className="panel-body">
-                      <p>Acceleration {this.state.tweetAcceleration}</p>
+                      <h4 className="text-center">Current Acceleration: {this.state.tweetAcceleration}</h4>
                       <RealTimeChart ref="accelChart" data={this.state.tweetAcceleration} dataType="acceleration" chartType="line"/>
                     </div>
                   </div>
@@ -207,7 +207,7 @@ var Dashboard = React.createClass({
               </div>
               <div className="row">
                 <div className="col-lg-4 col-md-6">
-                  <div className="panel-default">
+                  <div className="panel panel-default">
                     <div className="panel-heading">
                       <h3 className="panel-title">Retweet Percentage</h3>
                     </div>
@@ -216,23 +216,23 @@ var Dashboard = React.createClass({
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-4 col-md-12">
-                  <div className="panel-default">
-                    <div className="panel-heading">
-                      <h3 className="panel-title">Average Character Use (out of 144)</h3>
-                    </div>
-                    <div className="panel-body">
-                      <RealTimeGauge ref="characterGauge" data={this.state.characterUsePercentage} dataType="character"/>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 col-md-12">
-                  <div className="panel-default">
+                <div className="col-lg-4 col-md-6">
+                  <div className="panel panel-default">
                     <div className="panel-heading">
                       <h3 className="panel-title">Hashtags per Tweet</h3>
                     </div>
                     <div className="panel-body">
                       <RealTimeChart ref="hashtagChart" data={this.state.hashtagAverage} dataType="hashtag" chartType="bar"/>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-6">
+                  <div className="panel panel-default">
+                    <div className="panel-heading">
+                      <h3 className="panel-title">Average Character Use (out of 144)</h3>
+                    </div>
+                    <div className="panel-body">
+                      <RealTimeGauge ref="characterGauge" data={this.state.characterUsePercentage} dataType="character"/>
                     </div>
                   </div>
                 </div>

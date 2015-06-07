@@ -183,23 +183,23 @@ var Dashboard = React.createClass({displayName: "Dashboard",
             React.createElement("div", {className: "col-md-10"}, 
               React.createElement("div", {className: "row"}, 
                 React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("div", {className: "panel-default"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Velocity (tweets/second)")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
-                      React.createElement("p", null, "Velocity ", this.state.tweetVelocity), 
+                      React.createElement("h4", {className: "text-center"}, "Current Velocity: ", this.state.tweetVelocity), 
                       React.createElement(RealTimeChart, {ref: "velChart", data: this.state.tweetVelocity, dataType: "velocity", chartType: "area"})
                     )
                   )
                 ), 
                 React.createElement("div", {className: "col-md-6"}, 
-                  React.createElement("div", {className: "panel-default"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Acceleration (tweets/second", React.createElement("sup", null, "2"), ")")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
-                      React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration), 
+                      React.createElement("h4", {className: "text-center"}, "Current Acceleration: ", this.state.tweetAcceleration), 
                       React.createElement(RealTimeChart, {ref: "accelChart", data: this.state.tweetAcceleration, dataType: "acceleration", chartType: "line"})
                     )
                   )
@@ -207,7 +207,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               ), 
               React.createElement("div", {className: "row"}, 
                 React.createElement("div", {className: "col-lg-4 col-md-6"}, 
-                  React.createElement("div", {className: "panel-default"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Retweet Percentage")
                     ), 
@@ -216,23 +216,23 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-lg-4 col-md-12"}, 
-                  React.createElement("div", {className: "panel-default"}, 
-                    React.createElement("div", {className: "panel-heading"}, 
-                      React.createElement("h3", {className: "panel-title"}, "Average Character Use (out of 144)")
-                    ), 
-                    React.createElement("div", {className: "panel-body"}, 
-                      React.createElement(RealTimeGauge, {ref: "characterGauge", data: this.state.characterUsePercentage, dataType: "character"})
-                    )
-                  )
-                ), 
-                React.createElement("div", {className: "col-lg-4 col-md-12"}, 
-                  React.createElement("div", {className: "panel-default"}, 
+                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
+                    )
+                  )
+                ), 
+                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Average Character Use (out of 144)")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement(RealTimeGauge, {ref: "characterGauge", data: this.state.characterUsePercentage, dataType: "character"})
                     )
                   )
                 )
