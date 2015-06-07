@@ -45,6 +45,10 @@ var Dashboard = React.createClass({
     this.updateCharacterCount(data);
     this.updateHashtagCount(data);
 
+    if (this.hasCoordinates(data)) {
+      this.addToTweetMap(data);
+    }
+
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
     if (delta >= 1000) {
@@ -144,7 +148,17 @@ var Dashboard = React.createClass({
   },
   parseTweetCoordinates : function(f) {
     if (f.coordinates == null) {
-      f.coordinates = f.retweeted_status.coordinates
+      if (f.retweeted_status != null && f.retweeted_status.coordinates != null) {
+        f.coordinates = f.retweeted_status.coordinates
+      }
+      else {
+        f.coordinates = {
+          coordinates : [
+              f.place.bounding_box.coordinates[0][0],
+              f.place.bounding_box.coordinates[0][1]
+            ]
+        }
+      }
     }
     return {
       lng : parseFloat(f.coordinates.coordinates[0]),
@@ -152,6 +166,14 @@ var Dashboard = React.createClass({
       value: 1,
       key : parseFloat(f.coordinates.coordinates[0]) + ';' + parseFloat(f.coordinates.coordinates[1]) ,
     }
+  },
+  addToTweetMap : function(data) {
+    var coordinates = this.parseTweetCoordinates(data);
+    console.log(coordinates);
+    this.refs['tweetMap'].addPoint(coordinates);
+  },
+  hasCoordinates : function(tweet) {
+    return tweet.coordinates != null || (tweet.retweeted_status != null && tweet.retweeted_status.coordinates != null) || (tweet.place != null);
   },
   render : function() {
     return (
@@ -190,30 +212,12 @@ var Dashboard = React.createClass({
 
           <div className="container-fluid">
             <div className="col-sm-12 col-md-2">
-              <TweetList tweetList={this.state.tweetList} tweetCount={this.state.tweetCount} />
+              <TweetList loading={this.state.loading} tweetList={this.state.tweetList} tweetCount={this.state.tweetCount} />
             </div>
             <div className="cols-sm-12 col-md-10">
               <div className="row">
                 <div className="col-sm-12 col-md-6">
-                  <TweetMap coordinates={this.state.tweetList.filter(function(f) {
-                    return f.coordinates != null || 
-                      (f.retweeted_status != null && f.retweeted_status.coordinates != null);
-                  }).map(this.parseTweetCoordinates)
-                    .reduce(function(tweet1, tweet2) {
-                      var index = -1;
-                      for (var i = 0; i < tweet1.length; i++) {
-                        if (tweet1[i].key == tweet2.key) {
-                          index = i;
-                          break;
-                        }
-                      }
-                      if (index != -1) {
-                        tweet1[index].value++;
-                      }
-                      else
-                        tweet1.push(tweet2);
-                      return tweet1;
-                    }, [])} />
+                  <TweetMap ref="tweetMap" />
                 </div>
                 <div className="col-sm-12 col-md-6">
                   <div className="panel panel-default">

@@ -41,7 +41,7 @@ var TweetList = React.createClass({
             <span className="input-group-addon">
               Tweets:
             </span>
-            <input type="text" value={Math.max(this.props.tweetCount - 1,0)} className="form-control" aria-label=".." readOnly/>
+            <input type="text" value={this.state.loading?0:this.props.tweetCount} className="form-control" aria-label=".." readOnly/>
           </div>
         </div> 
       </div>

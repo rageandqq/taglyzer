@@ -8,14 +8,6 @@ var TweetMap = React.createClass({
       heatmapLayer : null
     }
   },
-  componentWillReceiveProps : function(props) {
-    var mapLayer = this.state.heatmapLayer;
-    var tweetData = this.state.tweetData;
-    if (mapLayer != null && Array.isArray(tweetData.data) && tweetData.data.length != props.coordinates.length) {
-      tweetData.data = props.coordinates;
-      mapLayer.setData(tweetData);
-    }
-  },
   componentDidMount : function() {
     var self = this;
     var baseLayer = L.tileLayer(
@@ -44,6 +36,33 @@ var TweetMap = React.createClass({
     });
 
     self.setState({heatmapLayer : heatmapLayer});
+  },
+  addPoint : function(coords) {
+    var data = this.state.tweetData.data;
+    var index = -1;
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].key == coords.key) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index != -1) {
+      data[i].value++;
+      var mapLayer = this.state.heatmapLayer;
+      if (mapLayer != null)
+        mapLayer.setData(data); 
+    }
+    else {
+      var mapLayer = this.state.heatmapLayer;
+      if (mapLayer != null)
+        mapLayer.addData(coords); 
+      data.push(coords);
+    }
+    this.setState({tweetData: {
+      max : this.state.tweetData.max,
+      data : data
+    }});
   },
   render : function() {
     return (

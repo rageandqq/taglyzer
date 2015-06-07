@@ -45,6 +45,10 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     this.updateCharacterCount(data);
     this.updateHashtagCount(data);
 
+    if (this.hasCoordinates(data)) {
+      this.addToTweetMap(data);
+    }
+
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
     if (delta >= 1000) {
@@ -144,7 +148,17 @@ var Dashboard = React.createClass({displayName: "Dashboard",
   },
   parseTweetCoordinates : function(f) {
     if (f.coordinates == null) {
-      f.coordinates = f.retweeted_status.coordinates
+      if (f.retweeted_status != null && f.retweeted_status.coordinates != null) {
+        f.coordinates = f.retweeted_status.coordinates
+      }
+      else {
+        f.coordinates = {
+          coordinates : [
+              f.place.bounding_box.coordinates[0][0],
+              f.place.bounding_box.coordinates[0][1]
+            ]
+        }
+      }
     }
     return {
       lng : parseFloat(f.coordinates.coordinates[0]),
@@ -152,6 +166,14 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       value: 1,
       key : parseFloat(f.coordinates.coordinates[0]) + ';' + parseFloat(f.coordinates.coordinates[1]) ,
     }
+  },
+  addToTweetMap : function(data) {
+    var coordinates = this.parseTweetCoordinates(data);
+    console.log(coordinates);
+    this.refs['tweetMap'].addPoint(coordinates);
+  },
+  hasCoordinates : function(tweet) {
+    return tweet.coordinates != null || (tweet.retweeted_status != null && tweet.retweeted_status.coordinates != null) || (tweet.place != null);
   },
   render : function() {
     return (
@@ -190,30 +212,12 @@ var Dashboard = React.createClass({displayName: "Dashboard",
 
           React.createElement("div", {className: "container-fluid"}, 
             React.createElement("div", {className: "col-sm-12 col-md-2"}, 
-              React.createElement(TweetList, {tweetList: this.state.tweetList, tweetCount: this.state.tweetCount})
+              React.createElement(TweetList, {loading: this.state.loading, tweetList: this.state.tweetList, tweetCount: this.state.tweetCount})
             ), 
             React.createElement("div", {className: "cols-sm-12 col-md-10"}, 
               React.createElement("div", {className: "row"}, 
                 React.createElement("div", {className: "col-sm-12 col-md-6"}, 
-                  React.createElement(TweetMap, {coordinates: this.state.tweetList.filter(function(f) {
-                    return f.coordinates != null || 
-                      (f.retweeted_status != null && f.retweeted_status.coordinates != null);
-                  }).map(this.parseTweetCoordinates)
-                    .reduce(function(tweet1, tweet2) {
-                      var index = -1;
-                      for (var i = 0; i < tweet1.length; i++) {
-                        if (tweet1[i].key == tweet2.key) {
-                          index = i;
-                          break;
-                        }
-                      }
-                      if (index != -1) {
-                        tweet1[index].value++;
-                      }
-                      else
-                        tweet1.push(tweet2);
-                      return tweet1;
-                    }, [])})
+                  React.createElement(TweetMap, {ref: "tweetMap"})
                 ), 
                 React.createElement("div", {className: "col-sm-12 col-md-6"}, 
                   React.createElement("div", {className: "panel panel-default"}, 
@@ -393,7 +397,7 @@ var TweetList = React.createClass({displayName: "TweetList",
             React.createElement("span", {className: "input-group-addon"}, 
               "Tweets:"
             ), 
-            React.createElement("input", {type: "text", value: Math.max(this.props.tweetCount - 1,0), className: "form-control", "aria-label": "..", readOnly: true})
+            React.createElement("input", {type: "text", value: this.state.loading?0:this.props.tweetCount, className: "form-control", "aria-label": "..", readOnly: true})
           )
         )
       )
@@ -418,14 +422,6 @@ var TweetMap = React.createClass({displayName: "TweetMap",
         data : []
       },
       heatmapLayer : null
-    }
-  },
-  componentWillReceiveProps : function(props) {
-    var mapLayer = this.state.heatmapLayer;
-    var tweetData = this.state.tweetData;
-    if (mapLayer != null && Array.isArray(tweetData.data) && tweetData.data.length != props.coordinates.length) {
-      tweetData.data = props.coordinates;
-      mapLayer.setData(tweetData);
     }
   },
   componentDidMount : function() {
@@ -456,6 +452,33 @@ var TweetMap = React.createClass({displayName: "TweetMap",
     });
 
     self.setState({heatmapLayer : heatmapLayer});
+  },
+  addPoint : function(coords) {
+    var data = this.state.tweetData.data;
+    var index = -1;
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].key == coords.key) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index != -1) {
+      data[i].value++;
+      var mapLayer = this.state.heatmapLayer;
+      if (mapLayer != null)
+        mapLayer.setData(data); 
+    }
+    else {
+      var mapLayer = this.state.heatmapLayer;
+      if (mapLayer != null)
+        mapLayer.addData(coords); 
+      data.push(coords);
+    }
+    this.setState({tweetData: {
+      max : this.state.tweetData.max,
+      data : data
+    }});
   },
   render : function() {
     return (
