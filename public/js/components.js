@@ -110,7 +110,8 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       hashtagAverage : updatedHCount/this.state.tweetCount
     });
   },
-  search : function() {
+  search : function(event) {
+    event.preventDefault();
     var self = this;
     var socket = this.state.socket;
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
@@ -168,12 +169,14 @@ var Dashboard = React.createClass({displayName: "Dashboard",
 
                 ), 
                 React.createElement("div", {className: "col-sm-10 col-md-4"}, 
-                  React.createElement("div", {className: "form-group"}, 
-                    React.createElement("div", {className: "input-group"}, 
-                      React.createElement("span", {className: "input-group-addon"}, "#"), 
-                      React.createElement("input", {className: "form-control", type: "text", value: this.state.searchTerm, onChange: this.handleSearchTermChange}), 
-                      React.createElement("span", {className: "input-group-btn"}, 
-                        React.createElement("button", {className: "btn btn-default", type: "button", id: "search-button", onClick: this.search}, "Analyze")
+                  React.createElement("form", {onSubmit: this.search}, 
+                    React.createElement("div", {className: "form-group"}, 
+                      React.createElement("div", {className: "input-group"}, 
+                        React.createElement("span", {className: "input-group-addon"}, "#"), 
+                        React.createElement("input", {className: "form-control", type: "text", value: this.state.searchTerm, onChange: this.handleSearchTermChange}), 
+                        React.createElement("span", {className: "input-group-btn"}, 
+                          React.createElement("button", {className: "btn btn-default", type: "button", id: "search-button", onClick: this.search}, "Analyze")
+                        )
                       )
                     )
                   )

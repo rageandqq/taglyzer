@@ -110,7 +110,8 @@ var Dashboard = React.createClass({
       hashtagAverage : updatedHCount/this.state.tweetCount
     });
   },
-  search : function() {
+  search : function(event) {
+    event.preventDefault();
     var self = this;
     var socket = this.state.socket;
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
@@ -168,15 +169,17 @@ var Dashboard = React.createClass({
 
                 </div>
                 <div className="col-sm-10 col-md-4">
-                  <div className="form-group">
-                    <div className="input-group">
-                      <span className="input-group-addon">#</span>
-                      <input className="form-control" type="text" value={this.state.searchTerm} onChange={this.handleSearchTermChange}/>
-                      <span className="input-group-btn">
-                        <button className="btn btn-default" type="button" id="search-button" onClick={this.search}>Analyze</button>
-                      </span>
+                  <form onSubmit={this.search}>
+                    <div className="form-group">
+                      <div className="input-group">
+                        <span className="input-group-addon">#</span>
+                        <input className="form-control" type="text" value={this.state.searchTerm} onChange={this.handleSearchTermChange}/>
+                        <span className="input-group-btn">
+                          <button className="btn btn-default" type="button" id="search-button" onClick={this.search}>Analyze</button>
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
                 <div className="col-sm-2 col-md-4">
 
