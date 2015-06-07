@@ -5,7 +5,8 @@ var Dashboard = React.createClass({
               socket : null,
               searchTerm : "",
               tweetList : [],
-              autoScrollTweets : true
+              autoScrollTweets : true,
+              lastVelUpdateTime : new Date()
            };
   },
   componentDidMount : function() {
@@ -34,6 +35,7 @@ var Dashboard = React.createClass({
     this.setState(this.getInitialState());
   },
   search : function() {
+    this.reset();
     var socket = this.state.socket;
     if (socket != null) {
       socket.emit('analyze', this.state.searchTerm);
