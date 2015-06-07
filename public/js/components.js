@@ -12,7 +12,9 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               tweetVelocity : 0,
               tweetAcceleration : 0,
               tweetCount : 0,
-              tweetHistory : 50 //show no more than 100 tweets
+              tweetHistory : 50, //show no more than 100 tweets
+              retweetCount : 0,
+              retweetPercentage : 0
            };
   },
   componentDidMount : function() {
@@ -36,6 +38,8 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     }
 
     this.addTweet(data);
+    this.updateRetweetCount(data);
+
 
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
@@ -49,6 +53,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     }
   },
   addTweet : function(data) {
+    console.log(data);
     var list = this.state.tweetList;
     var count = this.state.tweetCount;
     list.push(data);
@@ -66,13 +71,23 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       tweetAcceleration : 0,
       lastUpdateTime : new Date(),
       lastUpdateCount : 0,
-      tweetCount : 0
+      tweetCount : 0,
+      retweetCount : 0,
+      retweetPerce : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
       localState.loading = true;
     }
     this.setState(localState);
+  },
+  updateRetweetCount : function(data) {
+    var rCount = this.state.retweetCount;
+    var updatedRCount = rCount + ((data.retweeted_status != null)?1:0);
+    this.setState({ 
+      retweetCount : updatedRCount,
+      retweetPercentage : updatedRCount/this.state.tweetCount
+    });
   },
   search : function() {
     var socket = this.state.socket;
@@ -158,6 +173,26 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 )
+              ), 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-lg-4"}, 
+                  React.createElement("div", {className: "panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Retweet Percentage")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement(RealTimeGauge, {ref: "retweetGauge", data: this.state.retweetPercentage, dataType: "retweet"})
+                    )
+                  )
+                ), 
+                React.createElement("div", {className: "col-lg-4"}
+
+                ), 
+                React.createElement("div", {className: "col-lg-4"}
+
+                )
+              ), 
+              React.createElement("div", {className: "row"}
               )
             )
           )
@@ -201,6 +236,39 @@ var RealTimeChart = React.createClass({displayName: "RealTimeChart",
   render : function() {
     return (
       React.createElement("div", {id: this.props.dataType+'Chart', className: "real-time-chart"})
+    );
+  }
+});
+
+var RealTimeGauge = React.createClass({displayName: "RealTimeGauge",
+  getInitialState : function() {
+    return {
+      epoch : null,
+      data : 0
+    }
+  },
+  componentWillReceiveProps : function(props) {
+    var chart = this.state.epoch;
+    if (chart != null && this.state.data != props.data) {
+      chart.push(props.data);
+      this.setState({data : props.data});
+    }
+  },
+  resetChart : function() {
+    var now = new Date();
+    var chart = $('#' + this.props.dataType + 'Gauge').epoch({
+      type : 'time.gauge',
+      data : 0,
+      height : 300
+    });
+    this.setState({epoch : chart, data : 0});
+  },
+  componentDidMount : function() {
+    this.resetChart();
+  },
+  render : function() {
+    return (
+      React.createElement("div", {id: this.props.dataType + 'Gauge', className: "real-time-chart"})
     );
   }
 });

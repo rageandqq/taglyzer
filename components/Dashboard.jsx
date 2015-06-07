@@ -12,7 +12,9 @@ var Dashboard = React.createClass({
               tweetVelocity : 0,
               tweetAcceleration : 0,
               tweetCount : 0,
-              tweetHistory : 50 //show no more than 100 tweets
+              tweetHistory : 50, //show no more than 100 tweets
+              retweetCount : 0,
+              retweetPercentage : 0
            };
   },
   componentDidMount : function() {
@@ -36,6 +38,8 @@ var Dashboard = React.createClass({
     }
 
     this.addTweet(data);
+    this.updateRetweetCount(data);
+
 
     var now = new Date();
     var delta = Math.abs(this.state.lastUpdateTime.getTime() - now.getTime());
@@ -49,6 +53,7 @@ var Dashboard = React.createClass({
     }
   },
   addTweet : function(data) {
+    console.log(data);
     var list = this.state.tweetList;
     var count = this.state.tweetCount;
     list.push(data);
@@ -66,13 +71,23 @@ var Dashboard = React.createClass({
       tweetAcceleration : 0,
       lastUpdateTime : new Date(),
       lastUpdateCount : 0,
-      tweetCount : 0
+      tweetCount : 0,
+      retweetCount : 0,
+      retweetPerce : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
       localState.loading = true;
     }
     this.setState(localState);
+  },
+  updateRetweetCount : function(data) {
+    var rCount = this.state.retweetCount;
+    var updatedRCount = rCount + ((data.retweeted_status != null)?1:0);
+    this.setState({ 
+      retweetCount : updatedRCount,
+      retweetPercentage : updatedRCount/this.state.tweetCount
+    });
   },
   search : function() {
     var socket = this.state.socket;
@@ -158,6 +173,26 @@ var Dashboard = React.createClass({
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="row">
+                <div className="col-lg-4">
+                  <div className="panel-default">
+                    <div className="panel-heading">
+                      <h3 className="panel-title">Retweet Percentage</h3>
+                    </div>
+                    <div className="panel-body">
+                      <RealTimeGauge ref="retweetGauge" data={this.state.retweetPercentage} dataType="retweet"/>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4">
+
+                </div>
+                <div className="col-lg-4">
+
+                </div>
+              </div>
+              <div className="row">
               </div>
             </div>
           </div>
