@@ -10,7 +10,9 @@ var Dashboard = React.createClass({
               lastUpdateTime : new Date(),
               lastUpdateCount : 0,
               tweetVelocity : 0,
-              tweetAcceleration : 0
+              tweetAcceleration : 0,
+              tweetCount : 0,
+              tweetHistory : 50 //show no more than 100 tweets
            };
   },
   componentDidMount : function() {
@@ -42,14 +44,19 @@ var Dashboard = React.createClass({
       this.updateVelocity(delta);
       this.setState({
         lastUpdateTime : now,
-        lastUpdateCount : this.state.tweetList.length
+        lastUpdateCount : this.state.tweetCount
       });
     }
   },
   addTweet : function(data) {
     var list = this.state.tweetList;
+    var count = this.state.tweetCount;
     list.push(data);
-    this.setState({tweetList : list});
+    count++;
+    if (list.length > this.state.tweetHistory) {
+      list.unshift();
+    }
+    this.setState({tweetList : list, tweetCount: count});
   },
   resetTweets : function(isLoading) {
     var localState = {
@@ -58,7 +65,8 @@ var Dashboard = React.createClass({
       tweetVelocity : 0,
       tweetAcceleration : 0,
       lastUpdateTime : new Date(),
-      lastUpdateCount : 0
+      lastUpdateCount : 0,
+      tweetCount : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
@@ -71,6 +79,8 @@ var Dashboard = React.createClass({
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
       this.setState({lastSearchedTerm : this.state.searchTerm});
       this.resetTweets(true);
+      this.refs['accelChart'].resetChart();
+      this.refs['velChart'].resetChart();
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -78,14 +88,14 @@ var Dashboard = React.createClass({
     this.setState({searchTerm : event.target.value});
   },
   updateVelocity : function(delta) {
-    var tweetCount = this.state.tweetList.length;
+    var tweetCount = this.state.tweetCount;
     var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
     this.setState({
       tweetVelocity : vel
     });
   },
   updateAcceleration : function(delta) {
-    var tweetCount = this.state.tweetList.length;
+    var tweetCount = this.state.tweetCount;
     var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
     var accel = (vel - this.state.tweetVelocity)/(delta/1000);
     this.setState({
@@ -133,7 +143,7 @@ var Dashboard = React.createClass({
                     </div>
                     <div className="panel-body">
                       <p>Velocity {this.state.tweetVelocity}</p>
-                      <RealTimeChart data={this.state.tweetVelocity} type="velocity"/>
+                      <RealTimeChart ref="velChart" data={this.state.tweetVelocity} dataType="velocity" chartType="area"/>
                     </div>
                   </div>
                 </div>
@@ -144,7 +154,7 @@ var Dashboard = React.createClass({
                     </div>
                     <div className="panel-body">
                       <p>Acceleration {this.state.tweetAcceleration}</p>
-                      <RealTimeChart data={this.state.tweetAcceleration} type="acceleration"/>
+                      <RealTimeChart ref="accelChart" data={this.state.tweetAcceleration} dataType="acceleration" chartType="line"/>
                     </div>
                   </div>
                 </div>

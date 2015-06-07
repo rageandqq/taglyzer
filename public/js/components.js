@@ -10,7 +10,9 @@ var Dashboard = React.createClass({displayName: "Dashboard",
               lastUpdateTime : new Date(),
               lastUpdateCount : 0,
               tweetVelocity : 0,
-              tweetAcceleration : 0
+              tweetAcceleration : 0,
+              tweetCount : 0,
+              tweetHistory : 50 //show no more than 100 tweets
            };
   },
   componentDidMount : function() {
@@ -42,14 +44,19 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       this.updateVelocity(delta);
       this.setState({
         lastUpdateTime : now,
-        lastUpdateCount : this.state.tweetList.length
+        lastUpdateCount : this.state.tweetCount
       });
     }
   },
   addTweet : function(data) {
     var list = this.state.tweetList;
+    var count = this.state.tweetCount;
     list.push(data);
-    this.setState({tweetList : list});
+    count++;
+    if (list.length > this.state.tweetHistory) {
+      list.unshift();
+    }
+    this.setState({tweetList : list, tweetCount: count});
   },
   resetTweets : function(isLoading) {
     var localState = {
@@ -58,7 +65,8 @@ var Dashboard = React.createClass({displayName: "Dashboard",
       tweetVelocity : 0,
       tweetAcceleration : 0,
       lastUpdateTime : new Date(),
-      lastUpdateCount : 0
+      lastUpdateCount : 0,
+      tweetCount : 0
     }
     if (isLoading) {
       localState.tweetList.push({text:"LOADING"});
@@ -71,6 +79,8 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
       this.setState({lastSearchedTerm : this.state.searchTerm});
       this.resetTweets(true);
+      this.refs['accelChart'].resetChart();
+      this.refs['velChart'].resetChart();
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -78,14 +88,14 @@ var Dashboard = React.createClass({displayName: "Dashboard",
     this.setState({searchTerm : event.target.value});
   },
   updateVelocity : function(delta) {
-    var tweetCount = this.state.tweetList.length;
+    var tweetCount = this.state.tweetCount;
     var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
     this.setState({
       tweetVelocity : vel
     });
   },
   updateAcceleration : function(delta) {
-    var tweetCount = this.state.tweetList.length;
+    var tweetCount = this.state.tweetCount;
     var vel = (tweetCount - this.state.lastUpdateCount)/(delta/1000);
     var accel = (vel - this.state.tweetVelocity)/(delta/1000);
     this.setState({
@@ -133,7 +143,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement("p", null, "Velocity ", this.state.tweetVelocity), 
-                      React.createElement(RealTimeChart, {data: this.state.tweetVelocity, type: "velocity"})
+                      React.createElement(RealTimeChart, {ref: "velChart", data: this.state.tweetVelocity, dataType: "velocity", chartType: "area"})
                     )
                   )
                 ), 
@@ -144,7 +154,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration), 
-                      React.createElement(RealTimeChart, {data: this.state.tweetAcceleration, type: "acceleration"})
+                      React.createElement(RealTimeChart, {ref: "accelChart", data: this.state.tweetAcceleration, dataType: "acceleration", chartType: "line"})
                     )
                   )
                 )
@@ -172,21 +182,25 @@ var RealTimeChart = React.createClass({displayName: "RealTimeChart",
       this.setState({data : props.data});
     }
   },
-  componentDidMount : function() {
+  resetChart : function() {
     var now = new Date();
-    var chart = $('#' + this.props.type + 'Chart').epoch({
-      type : 'time.area',
+    var chart = $('#' + this.props.dataType + 'Chart').epoch({
+      type : 'time.' + this.props.chartType,
       data : [{
-        label : this.props.type,
+        label : this.props.dataType,
         values : [ { time: now.getTime()/1000, y: 0 }]
       }],
-      axes : ['bottom', 'left']
+      axes : ['bottom', 'left'],
+      height: 300
     });
     this.setState({epoch : chart});
   },
+  componentDidMount : function() {
+    this.resetChart();
+  },
   render : function() {
     return (
-      React.createElement("div", {id: this.props.type+'Chart'})
+      React.createElement("div", {id: this.props.dataType+'Chart', className: "real-time-chart"})
     );
   }
 });
@@ -237,38 +251,3 @@ var Tweet = React.createClass({displayName: "Tweet",
 });
 
 
-
-var RealTimeChart = React.createClass({displayName: "RealTimeChart",
-  getInitialState : function() {
-    return {
-      epoch : null,
-      data : 0
-    }
-  },
-  componentWillReceiveProps : function(props) {
-    var chart = this.state.epoch;
-    if (chart != null && this.state.data != props.data) {
-      var now = new Date();
-      chart.push([{time:now.getTime()/1000, y:props.data}]);
-      this.setState({data : props.data});
-    }
-  },
-  componentDidMount : function() {
-    var now = new Date();
-    var chart = $('#' + this.props.type + 'Chart').epoch({
-      type : 'time.area',
-      data : [{
-        label : this.props.type,
-        values : [ { time: now.getTime()/1000, y: 0 }]
-      }],
-      axes : ['bottom', 'left'],
-      height: 300
-    });
-    this.setState({epoch : chart});
-  },
-  render : function() {
-    return (
-      React.createElement("div", {id: this.props.type+'Chart'})
-    );
-  }
-});

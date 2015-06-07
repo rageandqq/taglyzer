@@ -13,21 +13,25 @@ var RealTimeChart = React.createClass({
       this.setState({data : props.data});
     }
   },
-  componentDidMount : function() {
+  resetChart : function() {
     var now = new Date();
-    var chart = $('#' + this.props.type + 'Chart').epoch({
-      type : 'time.area',
+    var chart = $('#' + this.props.dataType + 'Chart').epoch({
+      type : 'time.' + this.props.chartType,
       data : [{
-        label : this.props.type,
+        label : this.props.dataType,
         values : [ { time: now.getTime()/1000, y: 0 }]
       }],
-      axes : ['bottom', 'left']
+      axes : ['bottom', 'left'],
+      height: 300
     });
     this.setState({epoch : chart});
   },
+  componentDidMount : function() {
+    this.resetChart();
+  },
   render : function() {
     return (
-      <div id={this.props.type+'Chart'}></div>
+      <div id={this.props.dataType+'Chart'} className="real-time-chart"></div>
     );
   }
 });
