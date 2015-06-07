@@ -21,8 +21,7 @@ var RealTimeChart = React.createClass({
         label : this.props.type,
         values : [ { time: now.getTime()/1000, y: 0 }]
       }],
-      axes : ['bottom', 'left'],
-      height: 300
+      axes : ['bottom', 'left']
     });
     this.setState({epoch : chart});
   },

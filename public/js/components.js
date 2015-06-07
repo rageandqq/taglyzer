@@ -133,7 +133,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement("p", null, "Velocity ", this.state.tweetVelocity), 
-                      React.createElement(VelocityChart, {velocity: this.state.tweetVelocity})
+                      React.createElement(RealTimeChart, {data: this.state.tweetVelocity, type: "velocity"})
                     )
                   )
                 ), 
@@ -143,7 +143,8 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                       React.createElement("h3", {className: "panel-title"}, "Acceleration (tweets/second", React.createElement("sup", null, "2"), ")")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
-                      React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration)
+                      React.createElement("p", null, "Acceleration ", this.state.tweetAcceleration), 
+                      React.createElement(RealTimeChart, {data: this.state.tweetAcceleration, type: "acceleration"})
                     )
                   )
                 )
@@ -152,6 +153,40 @@ var Dashboard = React.createClass({displayName: "Dashboard",
           )
 
         )
+    );
+  }
+});
+
+var RealTimeChart = React.createClass({displayName: "RealTimeChart",
+  getInitialState : function() {
+    return {
+      epoch : null,
+      data : 0
+    }
+  },
+  componentWillReceiveProps : function(props) {
+    var chart = this.state.epoch;
+    if (chart != null && this.state.data != props.data) {
+      var now = new Date();
+      chart.push([{time:now.getTime()/1000, y:props.data}]);
+      this.setState({data : props.data});
+    }
+  },
+  componentDidMount : function() {
+    var now = new Date();
+    var chart = $('#' + this.props.type + 'Chart').epoch({
+      type : 'time.area',
+      data : [{
+        label : this.props.type,
+        values : [ { time: now.getTime()/1000, y: 0 }]
+      }],
+      axes : ['bottom', 'left']
+    });
+    this.setState({epoch : chart});
+  },
+  render : function() {
+    return (
+      React.createElement("div", {id: this.props.type+'Chart'})
     );
   }
 });
@@ -203,36 +238,37 @@ var Tweet = React.createClass({displayName: "Tweet",
 
 
 
-var VelocityChart = React.createClass({displayName: "VelocityChart",
+var RealTimeChart = React.createClass({displayName: "RealTimeChart",
   getInitialState : function() {
     return {
       epoch : null,
-      velocity : 0
+      data : 0
     }
   },
   componentWillReceiveProps : function(props) {
     var chart = this.state.epoch;
-    if (chart != null && this.state.velocity != props.velocity) {
+    if (chart != null && this.state.data != props.data) {
       var now = new Date();
-      chart.push([{time:now.getTime(), y:props.velocity}]);
-      this.setState({velocity : props.velocity});
+      chart.push([{time:now.getTime()/1000, y:props.data}]);
+      this.setState({data : props.data});
     }
   },
   componentDidMount : function() {
     var now = new Date();
-    var chart = $('#velocityChart').epoch({
+    var chart = $('#' + this.props.type + 'Chart').epoch({
       type : 'time.area',
       data : [{
-        label : "Velocity",
-        values : [ { time: now.getTime(), y: 0 }]
+        label : this.props.type,
+        values : [ { time: now.getTime()/1000, y: 0 }]
       }],
-      axes : ['bottom', 'left']
+      axes : ['bottom', 'left'],
+      height: 300
     });
     this.setState({epoch : chart});
   },
   render : function() {
     return (
-      React.createElement("div", {id: "velocityChart"})
+      React.createElement("div", {id: this.props.type+'Chart'})
     );
   }
 });

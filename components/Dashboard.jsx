@@ -133,7 +133,7 @@ var Dashboard = React.createClass({
                     </div>
                     <div className="panel-body">
                       <p>Velocity {this.state.tweetVelocity}</p>
-                      <VelocityChart velocity={this.state.tweetVelocity}/>
+                      <RealTimeChart data={this.state.tweetVelocity} type="velocity"/>
                     </div>
                   </div>
                 </div>
@@ -144,6 +144,7 @@ var Dashboard = React.createClass({
                     </div>
                     <div className="panel-body">
                       <p>Acceleration {this.state.tweetAcceleration}</p>
+                      <RealTimeChart data={this.state.tweetAcceleration} type="acceleration"/>
                     </div>
                   </div>
                 </div>
