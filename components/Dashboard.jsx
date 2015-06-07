@@ -14,7 +14,9 @@ var Dashboard = React.createClass({
               tweetCount : 0,
               tweetHistory : 50, //show no more than 100 tweets
               retweetCount : 0,
-              retweetPercentage : 0
+              retweetPercentage : 0,
+              characterUsePercentage : 0,
+              characterCount : 0
            };
   },
   componentDidMount : function() {
@@ -39,6 +41,7 @@ var Dashboard = React.createClass({
 
     this.addTweet(data);
     this.updateRetweetCount(data);
+    this.updateCharacterCount(data);
 
 
     var now = new Date();
@@ -89,13 +92,24 @@ var Dashboard = React.createClass({
       retweetPercentage : updatedRCount/this.state.tweetCount
     });
   },
+  updateCharacterCount : function(data) {
+    var cCount = this.state.characterCount;
+    var updatedCCount = cCount = cCount + data.text.length;
+    this.setState({
+      characterCount : updatedCCount,
+      characterUsePercentage : updatedCCount/(144 * this.state.tweetCount) //max # characters
+    });
+  },
   search : function() {
+    var self = this;
     var socket = this.state.socket;
     if (socket != null && this.state.lastSearchedTerm != this.state.searchTerm) {
       this.setState({lastSearchedTerm : this.state.searchTerm});
       this.resetTweets(true);
-      this.refs['accelChart'].resetChart();
-      this.refs['velChart'].resetChart();
+      ['accelChart', 'velChart', 'characterGauge', 'retweetGauge']
+        .forEach(function(chart) {
+          self.refs[chart].resetChart();
+        });
       socket.emit('analyze', this.state.searchTerm);
     }
   },
@@ -186,7 +200,14 @@ var Dashboard = React.createClass({
                   </div>
                 </div>
                 <div className="col-lg-4">
-
+                  <div className="panel-default">
+                    <div className="panel-heading">
+                      <h3 className="panel-title">Average Character Use (out of 144)</h3>
+                    </div>
+                    <div className="panel-body">
+                      <RealTimeGauge ref="characterGauge" data={this.state.characterUsePercentage} dataType="character"/>
+                    </div>
+                  </div>
                 </div>
                 <div className="col-lg-4">
 
