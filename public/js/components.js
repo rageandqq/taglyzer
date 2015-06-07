@@ -149,12 +149,16 @@ var Dashboard = React.createClass({displayName: "Dashboard",
         React.createElement("div", null, 
           React.createElement("div", {className: "jumbotron"}, 
             React.createElement("div", {className: "container-fluid"}, 
-              React.createElement("div", {className: "col-lg-2 col-sm-2"}, 
-                React.createElement("h1", null, this.props.appName)
+
+              React.createElement("div", {className: "row"}, 
+                React.createElement("h1", {className: "text-center"}, this.props.appName)
               ), 
 
-              React.createElement("div", {className: "col-lg-10 col-sm-10"}, 
-                React.createElement("div", {className: "row"}, 
+              React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-4"}
+
+                ), 
+                React.createElement("div", {className: "col-md-4"}, 
                   React.createElement("div", {className: "form-group"}, 
                     React.createElement("div", {className: "input-group"}, 
                       React.createElement("span", {className: "input-group-addon"}, "#"), 
@@ -164,20 +168,21 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                       )
                     )
                   )
+                ), 
+                React.createElement("div", {className: "col-md-4"}
+
                 )
               )
             )
           ), 
 
           React.createElement("div", {className: "container-fluid"}, 
-            React.createElement("div", {className: "col-lg-3"}, 
-              React.createElement("div", {className: "panel panel-default"}, 
-                React.createElement(TweetList, {tweetList: this.state.tweetList})
-              )
+            React.createElement("div", {className: "col-md-2"}, 
+              React.createElement(TweetList, {tweetList: this.state.tweetList, tweetCount: this.state.tweetCount})
             ), 
-            React.createElement("div", {className: "col-lg-9"}, 
+            React.createElement("div", {className: "col-md-10"}, 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-lg-6"}, 
+                React.createElement("div", {className: "col-md-6"}, 
                   React.createElement("div", {className: "panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Velocity (tweets/second)")
@@ -188,7 +193,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-lg-6"}, 
+                React.createElement("div", {className: "col-md-6"}, 
                   React.createElement("div", {className: "panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Acceleration (tweets/second", React.createElement("sup", null, "2"), ")")
@@ -201,7 +206,7 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                 )
               ), 
               React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-lg-4"}, 
+                React.createElement("div", {className: "col-lg-4 col-md-6"}, 
                   React.createElement("div", {className: "panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Retweet Percentage")
@@ -211,23 +216,23 @@ var Dashboard = React.createClass({displayName: "Dashboard",
                     )
                   )
                 ), 
-                React.createElement("div", {className: "col-lg-4"}, 
-                  React.createElement("div", {className: "panel-default"}, 
-                    React.createElement("div", {className: "panel-heading"}, 
-                      React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
-                    ), 
-                    React.createElement("div", {className: "panel-body"}, 
-                      React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
-                    )
-                  )
-                ), 
-                React.createElement("div", {className: "col-lg-4"}, 
+                React.createElement("div", {className: "col-lg-4 col-md-12"}, 
                   React.createElement("div", {className: "panel-default"}, 
                     React.createElement("div", {className: "panel-heading"}, 
                       React.createElement("h3", {className: "panel-title"}, "Average Character Use (out of 144)")
                     ), 
                     React.createElement("div", {className: "panel-body"}, 
                       React.createElement(RealTimeGauge, {ref: "characterGauge", data: this.state.characterUsePercentage, dataType: "character"})
+                    )
+                  )
+                ), 
+                React.createElement("div", {className: "col-lg-4 col-md-12"}, 
+                  React.createElement("div", {className: "panel-default"}, 
+                    React.createElement("div", {className: "panel-heading"}, 
+                      React.createElement("h3", {className: "panel-title"}, "Hashtags per Tweet")
+                    ), 
+                    React.createElement("div", {className: "panel-body"}, 
+                      React.createElement(RealTimeChart, {ref: "hashtagChart", data: this.state.hashtagAverage, dataType: "hashtag", chartType: "bar"})
                     )
                   )
                 )
@@ -330,23 +335,34 @@ var TweetList = React.createClass({displayName: "TweetList",
     if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
-    var count = 0;
+    var salt = 0;
     return (
-    React.createElement("div", {className: "panel-body"}, 
-      React.createElement("div", {className: "list-group", id: "tweetList"}, 
-      
-        this.props.tweetList.map(function(tweet) {
-          count++;
-          return React.createElement(Tweet, {key: count + '' + tweet.id, val: tweet.text});
-        })
-      
+    React.createElement("div", {className: "panel panel-default"}, 
+      React.createElement("div", {className: "panel-heading"}, 
+        React.createElement("h3", {className: "panel-title"}, "Tweets")
       ), 
-      React.createElement("div", {className: "panel-footer"}, 
-        React.createElement("div", {className: "input-group"}, 
-          React.createElement("span", {className: "input-group-addon"}, 
-            React.createElement("input", {type: "checkbox", checked: this.state.autoScrollTweets, onChange: this.handleAutoScrollChange})
+      React.createElement("div", {className: "panel-body"}, 
+        React.createElement("div", {className: "list-group", id: "tweetList"}, 
+        
+          this.props.tweetList.map(function(tweet) {
+            salt++;
+            return React.createElement(Tweet, {key: salt + '' + tweet.id, val: tweet.text});
+          })
+        
+        ), 
+        React.createElement("div", {className: "panel-footer"}, 
+          React.createElement("div", {className: "input-group"}, 
+            React.createElement("span", {className: "input-group-addon"}, 
+              React.createElement("input", {type: "checkbox", checked: this.state.autoScrollTweets, onChange: this.handleAutoScrollChange})
+            ), 
+            React.createElement("input", {type: "text", value: "Auto scroll", className: "form-control", "aria-label": "..", readOnly: true})
           ), 
-          React.createElement("input", {type: "text", value: "Auto scroll", className: "form-control", "aria-label": "..", readOnly: true})
+          React.createElement("div", {className: "input-group"}, 
+            React.createElement("span", {className: "input-group-addon"}, 
+              "Tweets:"
+            ), 
+            React.createElement("input", {type: "text", value: Math.max(this.props.tweetCount - 1,0), className: "form-control", "aria-label": "..", readOnly: true})
+          )
         )
       )
     )

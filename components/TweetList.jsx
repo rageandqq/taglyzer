@@ -15,25 +15,36 @@ var TweetList = React.createClass({
     if (this.state.autoScrollTweets && domElem != null && domElem[0] != null) {
       $("#tweetList").scrollTop($("#tweetList")[0].scrollHeight);
     }
-    var count = 0;
+    var salt = 0;
     return (
-    <div className="panel-body">
-      <div className="list-group" id="tweetList">
-      {
-        this.props.tweetList.map(function(tweet) {
-          count++;
-          return <Tweet key={count + '' + tweet.id} val={tweet.text} />;
-        })
-      }
+    <div className="panel panel-default">
+      <div className="panel-heading">
+        <h3 className="panel-title">Tweets</h3>
       </div>
-      <div className="panel-footer">
-        <div className="input-group">
-          <span className="input-group-addon">
-            <input type="checkbox" checked={this.state.autoScrollTweets} onChange={this.handleAutoScrollChange} />
-          </span>
-          <input type="text" value="Auto scroll" className="form-control" aria-label=".." readOnly/>
+      <div className="panel-body">
+        <div className="list-group" id="tweetList">
+        {
+          this.props.tweetList.map(function(tweet) {
+            salt++;
+            return <Tweet key={salt + '' + tweet.id} val={tweet.text} />;
+          })
+        }
         </div>
-      </div> 
+        <div className="panel-footer">
+          <div className="input-group">
+            <span className="input-group-addon">
+              <input type="checkbox" checked={this.state.autoScrollTweets} onChange={this.handleAutoScrollChange} />
+            </span>
+            <input type="text" value="Auto scroll" className="form-control" aria-label=".." readOnly/>
+          </div>
+          <div className="input-group">
+            <span className="input-group-addon">
+              Tweets:
+            </span>
+            <input type="text" value={Math.max(this.props.tweetCount - 1,0)} className="form-control" aria-label=".." readOnly/>
+          </div>
+        </div> 
+      </div>
     </div>
     );
   }
